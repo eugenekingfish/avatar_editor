@@ -1,35 +1,45 @@
 import * as THREE from 'three';
 
-const scene = new THREE.Scene();
-let width = window.innerWidth;
-let height = window.innerHeight;
-
-const camera = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 1, 10 );
-camera.position.z = 10;
-
-const renderer = new THREE.WebGLRenderer( { alpha : true} );
+const scene = new THREE.Scene(); 
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const renderer = new THREE.WebGLRenderer();
 const loader = new THREE.TextureLoader();
+
+// Initialising the renderer and creating animation loop
+renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setAnimationLoop( animate );
+document.body.appendChild( renderer.domElement );
+
+camera.position.z = 5;
+
+scene.add(camera);
+camera.position.z = -5;
+
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
 
 let body_mats = [];
 
-function load_textures() {
+init();
+
+function init_sprite_mats() {
    for (let i = 1; i <= 8; ++i) {
-      let texture = loader.load("/Body/Body_0" + '' + i + '.png', );
-      body_mats[i] = new THREE.SpriteMaterial( { map: texture } );
+      let map = loader.load("/Body/Body_0" + '' + i + '.png', );
+      body_mats[i] = new THREE.SpriteMaterial( { map: map, color : 0xfa0000} );
    }
 }
 
 function init() {
-   renderer.setPixelRatio(window.devicePixelRatio);
-   renderer.setSize( window.innerWidth, window.innerHeight );
-   renderer.setAnimationLoop( animate );
-   document.body.appendChild( renderer.domElement );
 
-   scene.add(camera);
+   // Initialising the camera
 
-   load_textures();
+   /*
+   init_sprite_mats();
    const sprite = new THREE.Sprite( body_mats[1] );
    scene.add( sprite );
+   */
 
    /*
    let sprites = make_grid(1, 1, 0.1, new THREE.Vector3(0,0,0));
@@ -40,7 +50,6 @@ function init() {
    */
 }
 
-init();
 
 function on_pointer_move( event ) {
 	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -72,5 +81,7 @@ function make_grid(columns, rows, pad, origin) {
 }
 
 function animate() {
+   cube.rotation.x += 0.01;
+   cube.rotation.y += 0.01;
    renderer.render( scene, camera );
 }
